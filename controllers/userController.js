@@ -38,8 +38,10 @@ exports.createUser = async (req, res) => {
         password: encryptPassword,
         favorite: [],
         meals: [],
-        calories: 0,
+        calories: null,
         role: req.body.role,
+        date_birth: null,
+
         token,
       });
       const message = "Thanks for Registering";
@@ -51,6 +53,7 @@ exports.createUser = async (req, res) => {
           favorite: user.favorite,
           meals: user.meals,
           calories: user.calories,
+          date_birth: user.date_birth,
           token: user.token,
         },
         message: { message },
@@ -88,6 +91,7 @@ exports.login = async (req, res) => {
           favorite: emailAndPassExists.favorite,
           meals: emailAndPassExists.meals,
           calories: emailAndPassExists.calories,
+          date_birth: emailAndPassExists.date_birth,
         });
         // console.log("Login Successfull");
       } else {
@@ -96,6 +100,25 @@ exports.login = async (req, res) => {
     }
   } catch (err) {
     res.status(400).json({ message: err.message });
+  }
+};
+
+exports.edit = async (req, res) => {
+  try {
+    const { id, username, calories, date_birth } = req.body;
+    await User.updateOne(
+      { _id: id },
+      {
+        $set: {
+          username: username,
+          date_birth: date_birth,
+          calories: calories,
+        },
+      }
+    );
+    res.status(200).json("Update Card successfully");
+  } catch (err) {
+    console.log(err);
   }
 };
 

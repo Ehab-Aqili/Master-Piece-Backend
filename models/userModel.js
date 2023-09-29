@@ -31,6 +31,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ["admin", "user"],
   },
+  date_birth: String,
   token: String,
 });
 
