@@ -21,8 +21,18 @@ const userSchema = new mongoose.Schema({
     required: true,
     minLength: 6,
   },
-  favorite: [String],
-  meals: [String],
+  favorite: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Recipes",
+    },
+  ],
+  meals: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Recipes",
+    },
+  ],
   calories: {
     type: Number,
     min: 0,
@@ -34,12 +44,19 @@ const userSchema = new mongoose.Schema({
   date_birth: String,
   token: String,
 });
+const recipes = new mongoose.Schema({
+  recipe_calories: Number,
+  recipe_Name: String,
+  recipe_Categories: String,
+  recipe_image: String,
+});
 
 userSchema.methods.comPass = async (pass, passDB) => {
   return await bcrypt.compare(pass, passDB);
 };
 
 const User = mongoose.model("User", userSchema, "users");
+const Recipes = mongoose.model("Recipes", recipes, "recipes");
 
 mongoose
   .connect(process.env.CONN_STR, {
@@ -47,7 +64,7 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(() => {
-    console.log("DB Users Collection connected");
+    console.log("DB connected");
   })
   .catch((err) => {
     console.error("Mongoose connection error:", err);
@@ -56,4 +73,4 @@ mongoose
 mongoose.connection.on("disconnected", () => {
   console.log("Mongoose disconnected");
 });
-module.exports = User;
+module.exports = { User, Recipes };

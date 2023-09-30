@@ -1,4 +1,4 @@
-const User = require("../models/userModel");
+const { User, Recipes } = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const util = require("util");
 const bcrypt = require("bcrypt");
@@ -102,25 +102,147 @@ exports.login = async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 };
-
-exports.edit = async (req, res) => {
+//favorite data
+// {
+// recipeCalories: 231,
+//     recipeName: 'Chopped Spring Ramen',
+//     recipeCategories: 'Scallions & tomatoes',
+//     recipeImage: require('../assets/ResipeOne.png'),
+// }
+// Meals Data
+// {
+//  mealName: 'burger'
+//  image:
+//
+//
+// }
+exports.update = async (req, res) => {
   try {
     const { id, username, calories, date_birth } = req.body;
-    await User.updateOne(
-      { _id: id },
+    await User.findByIdAndUpdate(
+      id,
       {
-        $set: {
-          username: username,
-          date_birth: date_birth,
-          calories: calories,
-        },
+        username,
+        date_birth,
+        calories,
+      },
+      { new: true }
+    );
+    res.status(200).json({ message: "Profile updated successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.favorite = async (req, res) => {
+  try {
+    const { userId, recipeId } = req.body;
+    await User.updateOne(
+      { _id: userId },
+      {
+        $push: { favorite: recipeId },
       }
     );
-    res.status(200).json("Update Card successfully");
+    res.status(200).json({
+      message: "Add recipe to favorite successfully",
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ message: "Something went wrong" });
+  }
+};
+
+exports.removeFavorite = async (req, res) => {
+  try {
+    const { userId, recipeId } = req.body;
+    await User.updateOne(
+      { _id: userId },
+      {
+        $pull: { favorite: recipeId },
+      }
+    );
+    res.status(200).json({
+      message: "remove recipe from favorite successfully",
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ message: "Something went wrong" });
+  }
+};
+
+exports.getFavorite = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const user = await User.findById(userId);
+    const userFavoriteIds = user.favorite.map((item) => item);
+    console.log(userFavoriteIds);
+    const userFavorite = await Recipes.find({ _id: { $in: userFavoriteIds } });
+    res.status(200).json({
+      data: {
+        userFavorite,
+      },
+    });
   } catch (err) {
     console.log(err);
   }
 };
+
+exports.addMeal = async (req, res) => {
+  try {
+    const { userId, recipeId } = req.body;
+    await User.updateOne(
+      { _id: userId },
+      {
+        $push: { meals: recipeId },
+      }
+    );
+    res.status(200).json({
+      message: "Add recipe to meals successfully",
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ message: "Something went wrong" });
+  }
+};
+
+exports.removeMeal = async (req, res) => {
+  try {
+    const { userId, recipeId } = req.body;
+    await User.updateOne(
+      { _id: userId },
+      {
+        $pull: { meals: recipeId },
+      }
+    );
+    res.status(200).json({
+      message: "remove recipe from meals successfully",
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ message: "Something went wrong" });
+  }
+};
+
+exports.getMeals = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const user = await User.findById(userId);
+    const userMealIds = user.meals.map((item) => item);
+    console.log(userMealIds);
+    const userMeals = await Recipes.find({ _id: { $in: userMealIds } });
+    res.status(200).json({
+      data: {
+        userMeals,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+
+
 
 exports.protect = async (req, res, next) => {
   try {
