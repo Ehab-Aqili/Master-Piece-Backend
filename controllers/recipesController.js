@@ -1,13 +1,13 @@
-const { Recipes } = require("../models/userModel");
-const dotenv = require("dotenv");
+import Model from "../models/userModel.js";
+import dotenv from "dotenv";
 dotenv.config({ path: "../.env" });
-
-exports.test = async (req, res) => {
+const { Recipes } = Model;
+const test = async (req, res) => {
   console.log(req.body);
   res.send("test");
 };
 
-exports.createRecipe = async (req, res) => {
+const createRecipe = async (req, res) => {
   console.log(req);
   try {
     const recipe = await Recipes.create({
@@ -30,7 +30,7 @@ exports.createRecipe = async (req, res) => {
   }
 };
 
-exports.getAllRecipes = async (req, res) => {
+const getAllRecipes = async (req, res) => {
   try {
     const recipes = await Recipes.find();
 
@@ -49,7 +49,7 @@ exports.getAllRecipes = async (req, res) => {
   }
 };
 
-exports.editRecipe = async (req, res) => {
+const editRecipe = async (req, res) => {
   try {
     const { recipeId } = req.params;
     const updatedRecipe = await Recipes.findByIdAndUpdate(
@@ -80,7 +80,7 @@ exports.editRecipe = async (req, res) => {
   }
 };
 
-exports.removeRecipe = async (req, res) => {
+const removeRecipe = async (req, res) => {
   try {
     const { recipeId } = req.params;
     const deletedRecipe = await Recipes.findByIdAndRemove(recipeId);
@@ -100,4 +100,12 @@ exports.removeRecipe = async (req, res) => {
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
+};
+
+export default {
+  test,
+  createRecipe,
+  getAllRecipes,
+  editRecipe,
+  removeRecipe,
 };

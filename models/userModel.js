@@ -1,7 +1,7 @@
-const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
-const dotenv = require("dotenv");
-dotenv.config({ path: "../.env" });
+import mongoose from "mongoose";
+import bcrypt from "bcrypt";
+import dotenv from "dotenv";
+dotenv.config({ path: "./.env" });
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -57,7 +57,6 @@ userSchema.methods.comPass = async (pass, passDB) => {
 
 const User = mongoose.model("User", userSchema, "users");
 const Recipes = mongoose.model("Recipes", recipes, "recipes");
-
 mongoose
   .connect(process.env.CONN_STR, {
     useNewUrlParser: true,
@@ -73,4 +72,4 @@ mongoose
 mongoose.connection.on("disconnected", () => {
   console.log("Mongoose disconnected");
 });
-module.exports = { User, Recipes };
+export default {User, Recipes} ;

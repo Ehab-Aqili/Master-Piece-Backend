@@ -1,21 +1,22 @@
-const { User, Recipes } = require("../models/userModel");
-const jwt = require("jsonwebtoken");
-const util = require("util");
-const bcrypt = require("bcrypt");
-const dotenv = require("dotenv");
+import Model from "../models/userModel.js";
+import jwt from "jsonwebtoken";
+import util from "util";
+import bcrypt from "bcrypt";
+import dotenv from "dotenv";
 dotenv.config({ path: "../.env" });
-
-exports.test = async (req, res) => {
+const { User, Recipes } = Model;
+const test = async (req, res) => {
   console.log(req.body);
   res.send("test");
 };
+
 const createToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.LOGIN_EXPIRES,
   });
 };
 
-exports.createUser = async (req, res) => {
+const createUser = async (req, res) => {
   const key = req.body.admin_key;
   const role = req.body.role;
   console.log(req);
@@ -41,7 +42,6 @@ exports.createUser = async (req, res) => {
         calories: null,
         role: req.body.role,
         date_birth: null,
-
         token,
       });
       const message = "Thanks for Registering";
@@ -66,7 +66,7 @@ exports.createUser = async (req, res) => {
   }
 };
 
-exports.login = async (req, res) => {
+const login = async (req, res) => {
   try {
     const emailAndPassExists = await User.findOne({
       email: req.body.email,
@@ -102,21 +102,8 @@ exports.login = async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 };
-//favorite data
-// {
-// recipeCalories: 231,
-//     recipeName: 'Chopped Spring Ramen',
-//     recipeCategories: 'Scallions & tomatoes',
-//     recipeImage: require('../assets/ResipeOne.png'),
-// }
-// Meals Data
-// {
-//  mealName: 'burger'
-//  image:
-//
-//
-// }
-exports.update = async (req, res) => {
+
+const update = async (req, res) => {
   try {
     const { id, username, calories, date_birth } = req.body;
     await User.findByIdAndUpdate(
@@ -135,7 +122,7 @@ exports.update = async (req, res) => {
   }
 };
 
-exports.favorite = async (req, res) => {
+const favorite = async (req, res) => {
   try {
     const { userId, recipeId } = req.body;
     await User.updateOne(
@@ -153,7 +140,7 @@ exports.favorite = async (req, res) => {
   }
 };
 
-exports.removeFavorite = async (req, res) => {
+const removeFavorite = async (req, res) => {
   try {
     const { userId, recipeId } = req.body;
     await User.updateOne(
@@ -171,7 +158,7 @@ exports.removeFavorite = async (req, res) => {
   }
 };
 
-exports.getFavorite = async (req, res) => {
+const getFavorite = async (req, res) => {
   try {
     const userId = req.params.id;
     const user = await User.findById(userId);
@@ -188,7 +175,7 @@ exports.getFavorite = async (req, res) => {
   }
 };
 
-exports.addMeal = async (req, res) => {
+const addMeal = async (req, res) => {
   try {
     const { userId, recipeId } = req.body;
     await User.updateOne(
@@ -206,7 +193,7 @@ exports.addMeal = async (req, res) => {
   }
 };
 
-exports.removeMeal = async (req, res) => {
+const removeMeal = async (req, res) => {
   try {
     const { userId, recipeId } = req.body;
     await User.updateOne(
@@ -224,7 +211,7 @@ exports.removeMeal = async (req, res) => {
   }
 };
 
-exports.getMeals = async (req, res) => {
+const getMeals = async (req, res) => {
   try {
     const userId = req.params.id;
     const user = await User.findById(userId);
@@ -241,10 +228,7 @@ exports.getMeals = async (req, res) => {
   }
 };
 
-
-
-
-exports.protect = async (req, res, next) => {
+const protect = async (req, res, next) => {
   try {
     const testToken = req.headers.authorization;
     let token;
@@ -263,4 +247,18 @@ exports.protect = async (req, res, next) => {
       message: error.message,
     });
   }
+};
+
+export default {
+  test,
+  createUser,
+  login,
+  update,
+  favorite,
+  removeFavorite,
+  getFavorite,
+  addMeal,
+  removeMeal,
+  getMeals,
+  protect,
 };
