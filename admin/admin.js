@@ -9,16 +9,35 @@ AdminJS.registerAdapter({
   Resource,
 });
 
-// We will need to create an instance of AdminJS with a basic resource
+const usersNavigation = {
+  name: "Users",
+  icon: "User",
+};
+const recipesNavigation = {
+  name: 'Recipes',
+  icon: 'User',
+}
+
 const admin = new AdminJS({
   resources: [
     {
       resource: User,
+      options: {
+        navigation: usersNavigation,
+      },
     },
     {
       resource: Recipes,
+      options: {
+        navigation: recipesNavigation,
+      },
     },
   ],
+  branding: {
+    logo: "",
+    companyName: "NutriChif",
+    softwareBrothers: false,
+  },
 });
 
 const adminRouter = AdminJSExpress.buildRouter(admin);
